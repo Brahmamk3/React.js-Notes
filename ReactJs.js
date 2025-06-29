@@ -99,6 +99,43 @@ Internal working/execution/rendering Of React code:
     - ReactDOM updates the Real DOM only where changes are needed, based on the diffing result.
     - Changes in the Real DOM automatically reflect in the web page.
 
+What is Deployment time?
+==========================
+You must run npm run build manually to prepare your app for production deployment
+Then It happens:
+Babel compiles JSX → JavaScript
+Minifies and optimizes the code
+create one Bundle file all files for production
+create build/ file to saved all bundle files
+This folder is ready to be uploaded to a live production server (e.g., Netlify, Vercel, Firebase)
+
+This does not happen automatically when you run npm start
+npm start
+Runs the app in development mode
+What it does:
+Babel compiles JSX → JavaScript
+Webpack bundles files in memory only (not written to disk) as singl file
+Starts a local development server (usually at http://localhost:3000)
+upload this file to local server 
+This entire process happens automatically in development mode without needing to run npm run build
+
+What is it Runtime?
+=====================
+Runtime is when your React app is running inside the user's browser and UI is displayed.
+
+What happens at runtime?
+The browser loads the bundled files (from build/)
+React starts running:
+React Creates the Virtual DOM via React Elements
+Idetify changes and Update the Real DOM.
+
+Note:
+- Virtual DOM is created at runtime, not at deployment time, and not during the bundling phase either.
+- When you run npm start, Webpack bundles all your React files (like App.js, index.js, CSS, etc.) into a single bundle file (e.g., main.js).
+  This bundled file is not saved on your disk — instead, it's stored temporarily in RAM (memory) and served to the browser via the local development server (http://localhost:3000).
+- When you run npm run build, the same bundling happens, but the output is saved to the disk in a build/ folder, which you can upload to a real (live) server for production.
+
+
 What is Reconciliation in React?
 =================================
 Reconciliation is the process where:
@@ -362,18 +399,176 @@ Note:
 -----
 -setState() actions are asynchronous. setState() doesn’t immediately mutate this.state.
 
+ React Events
+=================
+- In React, when you click a button, type in a textbox, or submit a form, special event handlers like onClick, onChange, and onSubmit are triggered.
+- These event handlers call the functions you define to handle the action.
+Flow: User Clicks ➜ onClick Event ➜ React Calls Your Function ➜ Function Runs ➜ You See Result
+
+Component vs PureComponent
+==========================
+-PureComponent is exactly the same as Component except that it handles the 
+ 'shouldComponentUpdate' method for us. 
+-When props or state changes, PureComponent will do a shallow comparison on both props and state.if there is a change in state/props, then only render() will be called. 
+-A normal Component always calls render() when we update the state. even though there is no change in the last state data and current state data.
+-Class components that extend the React.PureComponent class are treated as pure components.
+	Ex: class myComp extends React.PureComponent {
+		}
+-in Functional components, re-render happens only if the state changes. 
+-Every Functional Component is a Pure-Component.
+
+Reac.Memo Component
+====================
+-Introduced in React v16.6.  This improves performance.
+-React.memo() is a higher-order component.
+-React.memo() can be used for both class & function components.
+-Def : When a component is wrapped in React.memo(), React renders the component only if the props those are passed to that component changes.
+-lets you skip re-rendering a component when its props are unchanged.
+-ex: export default React.memo(MyComponent);
+
+LifeCycle Methods
+===================
+-Every component in React goes through a lifecycle of events.
+-The three phases are: 
+	1.Mounting - (constructor,getDerivedStateFromProps,render,componentDidMount)
+	2.Updating - (getDerivedStateFromProps,shouldComponentUpdate,render, getSnapshotBeforeUpdate, componentDidUpdate)
+	3.Unmounting - (componentWillUnmount)
+
+
+Mounting: means putting elements into the DOM. Intial rendering.
+---------------------------------------------
+1.constructor()
+2.static getDerivedStateFromProps(props,state)
+3.render()
+4.componentDidMount()
+
+Note:- The render() method is required and will always be called, 
+	   the others are optional and will be called if you define them.
+
+
+constructor()
+-----------
+-The constructor() method is called before anything else, when the component is initiated. 
+-It is the natural place to set up the initial state and other initial values.
+-The constructor() method is called with the props, as argument, 
+ and you should always start by calling the 'super(props)' before anything else,
+ Otherwise,this.props will be undefined.
+-This will initiate the parent's constructor method and allows the component to inherit methods from its parent (React.Component).
+-If you neither initialize state nor bind methods for your React component, there is no need to implement a constructor for React component.
+-setState() method should not be called in the constructor(). we will get console error
+ error - Can't call setState on a component that is not yet mounted
+
+
+static getDerivedStateFromProps()
+--------------------------------
+-The getDerivedStateFromProps() method is called right before rendering the element(s) in the DOM.
+-This is the natural place to set the state object based on the initial props.
+-It takes (props,state) as argument, and returns an object with changes to the state.
+-only fires when the parent causes a re-render and not as a result of a local setState.
+- getDerivedStateFromProps() method is called before creating virtual dom by called render() method at run time after completing conversition of jsx to js
+
+render()
+-------
+-The render() method returns JSX → React converts it to React elements (JavaScript objects) → React internally uses these to create the Virtual DOM.
+-it gets re-invoked when state/props data changes.
+
+
+
+componentDidMount()
+------------------
+-The componentDidMount() method is called after the component is rendered.
+-This is a good place to initiate the network request.
+-if we are going to fetch any data from an API then API call should be placed in this lifecycle method,and then we get the response, we can call the setState() method and render the element with updated data.
+-good place for DOM manipulation.
+
+
+
+Updating
+=========
+1.static getDerivedStateFromProps(props,state)
+2.shouldComponentUpdate()
+3.render()
+4.getSnapshotBeforeUpdate(prevProps, prevState)
+5.componentDidUpdate()
+
+
+getDerivedStateFromProps()
+-----------------------
+-while updating state/props getDerivedStateFromProps() method is called. 
+-This is the first method that is called when a component gets updated.
+-This is still the natural place to set the state object based on the initial props.
+
+
+shouldComponentUpdate()
+----------------------
+-In the shouldComponentUpdate() method a boolean value should be returned that specifies whether React should continue with the rendering or not.
+-The default value is true.
+-shouldComponentUpdate() lifecycle shouldn't be added if the class is extending React.PureComponent.
+
+
+getSnapshotBeforeUpdate(prevProps, prevState)
+------------------------
+-In the getSnapshotBeforeUpdate(prevProps, prevState) method we have access to the props and state before the update,meaning that even after the update, we can check what the values were before the update.
+
+
+example:
+-When the component is mounting it is rendered with the favorite color "red".
+-When the component has been mounted, a timer changes the state, and after one second,the favorite color becomes "yellow".
+-This action triggers the update phase, and since this component has a getSnapshotBeforeUpdate() method,this method is executed, and writes a message to the empty DIV1 element.
+
+
+componentDidUpdate()
+-------------------
+-The componentDidUpdate() method is called after the component is updated in the DOM.
+-componentDidUpdate() is invoked immediately after the state is updated.
+-This method is not called for the initial render,componentDidMount() will be called for the initial render. 
+-it gets called only when state/props gets updated.
 
 
 
 
+Unmounting - Removing the component from DOM
+==========
+-The next phase in the lifecycle is when a component is removed from the DOM,or unmounting.
+-React has only one built-in method that gets called when a component is unmounted.
+
+componentWillUnmount()
+---------------------
+-Called immediately before a component is destroyed. 
+-Perform any necessary cleanup in this method, such as cancel network requests, 
+ or cleaning up any DOM elements created in componentDidMount.
+-clearTimeout, ClearInterval , Unsubscribe, detachEventHandlers
 
 
+React Higher Order Components (HOCs)
+=============================
+-A higher-order component (HOC) is a technique in React for re-using component logic.
+-To Share Common Functionalities accross components without repeating the code.
+-Higher order Component takes one or more components as arguments, and return a new upgraded component.
+  newComponent = higherOrderComponent( originalComponent )
+-Higher order components are JavaScript functions used for adding additional functionalities to the existing component.
+-These functions are pure, which means they are receiving data and returning values according to that data. 
+-Authentication,Logging,Styling and Theming
 
+Routing:
+========
+- Routing means navigating to different components without realoading the webpage.
+- Single Page Applications(SPAs) are web applications that load a single HTML page and dynamically update that page as user interacts with the application. 
+- Complete page Re-load doesn't happen. only a portion of a page gets loaded.
+- HashRouter handles all routing inside the browser (frontend).It does not involve the backend or server at all
 
+Types of routes:
+================
+React Router provides two different kind of routes:
+1. BrowserRouter (builds classic URLs)
+2. HashRouter (builds URLs with the hash)
 
+https://application.com/dashboard     // BrowserRouter  ( IE>9 (OR) any other browser )
+https://application.com/#/dashboard   // HashRouter (IE<9)
 
-
-
+Difference B/W BrowserRouter vs HashRouter:
+- We use BrowserRouter more than HashRouter in real life because it gives clean, professional URLs like:https://myapp.com/about(instead of https://myapp.com/#/about)
+- HashRouter handles all routing inside the browser (frontend).It does not involve the backend or server at all
 
 
 
