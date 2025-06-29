@@ -191,7 +191,7 @@ When to use a Class Component over a Function Component? or Why we use Hooks in 
 What is State in React?
 ==========================
 
-forceUpsate:
+forceUpdate:
 ==============
 Def : forceUpdate() is function and  used in class components to manually trigger a re-render, even if state or props haven't changed.
 - It is not recommended to use forceUpdate().
@@ -213,7 +213,8 @@ class App extends React.Component {
     );
   }
 }
-  Data Binding in React
+ 
+Data Binding in React
 ======================
 Def: Data binding id the connection between UI and state.
 
