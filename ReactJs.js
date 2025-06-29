@@ -188,9 +188,197 @@ When to use a Class Component over a Function Component? or Why we use Hooks in 
 -However, from React 16.8 with the addition of Hooks, we use functional component than class component. by using hooks we handle state management and life cycle methods operations.
 -So, it is always recommended to use Function components, unless you need a React functionality whose Function component equivalent is not present yet, like Error Boundaries.
 
+
+Props in React
+=================
+- Props (short for properties) are used to pass data from a parent component to a child component.
+- Props are read-only and follow one-way (unidirectional) data flow — from parent to child.
+- You can pass values or functions as props.
+- Props are received in the child component as a JavaScript object.
+
+What is Props Destructuring
+============================
+- Props destructuring means directly extracting values from the props object instead of using props.name, props.age, etc.
+- It makes the code cleaner and shorter.
+Ex:
+// Parent Component
+function App() {
+  return (
+    <Profile name="Ram" age={25} location="Hyderabad" />
+  );
+}
+
+// Child Component with Props Destructuring
+function Profile(props) {
+	let { name, age, location }=props
+  return (
+    <>
+      <h1>Name: {name}</h1>
+      <h2>Age: {age}</h2>
+      <h3>Location: {location}</h3>
+    </>
+  );
+}
+
+What is PropTypes?
+=====================
+- PropTypes is a feature in React used to check the type of props passed to a component.
+- It helps make sure that components receive the correct data types (e.g., string, number, object).
+Ex:
+import React from "react";
+import PropTypes from "prop-types"; // ✅ import PropTypes
+
+export default function App() {
+  let name = "Ram";
+  let age = 23;
+  return <Child name={name} age={age} />  
+}
+
+function Child({ name, age }) {
+  return <h1>{name} - {age}</h1>  
+}
+
+// ✅ Define PropTypes
+Child.propTypes = {
+  name: PropTypes.string.isRequired,
+  age: PropTypes.number
+};
+
+
+What is isRequired?
+- PropTypes.string.isRequired means that this prop must be passed.
+- If not, React will show a warning in the console (in development mode).
+
+Advantages of PropTypes
+- Helps validate props at runtime.
+- Warns if a required prop is missing or has the wrong type.
+- Makes your component’s API clearer for other developers.
+
+Default Props
+==============
+- Default props are the default values assigned to props when the parent component doesn’t pass them.
+- If parent pass vales to props default values not printed in webpage. This is same like default parametrs in fumction.
+Ex:
+import React from "react";
+
+// ✅ Parent Component
+export default function App() {
+  return (
+    <>
+      <Greeting /> {/* No name passed */}
+      <Greeting name="Ram" /> {/* Name passed */}
+    </>
+  );
+}
+
+// ✅ Child Component
+function Greeting({ name = "Ravi" }) {
+  return <h1>Hello, {name}!</h1>;
+}
+
+Output webpage:
+Hello, Ravi!
+Hello, Ram!
+
+What is props.children?
+============================
+- props.children is a special prop in React.
+- It represents the content you put between the opening and closing tags of a component.
+
+Ex:
+export default function App() {
+  return (
+    <Wrapper>
+      <h1>Hello</h1>
+      <p>This is inside the wrapper</p>
+      <Child />
+    </Wrapper>
+  );
+}
+function Wrapper(props) {
+  return (
+    <div >
+      {props.children}
+    </div>
+  );
+}
+
+function Child() {
+  return (
+    <>
+      <h1>Child component</h1>
+    </>
+  )
+}
+
+Output webpage:
+Hello
+This is inside the wrapper
+Child component
+
+Props Drilling:
+===================
+- passing props from parent to deeper nested child througn intermediate multiple childs is called props drilling
+
+Drawbacks:
+- un-necessarly pass the props to intermediate childs which not good
+- if one of the intermediate child get error the whole procees gives error.
+
+Limitations of Local Variables
+==============================
+No re-rendering : Changing a Local variable doesn't re-render, the component won't update to reflect the new value.
+No Persistence : Local variables are reset every time the component re-renders - not saved.
+
+export default function StateDemo1() {
+    let count = 0;
+    const increment = ()=>{
+        count++;
+        console.log(count);
+    }
+    return <>
+        <h2>State Demo 1</h2>
+        <div>Count value is: {count}</div>
+        <button onClick={increment}>Increment</button>
+    </>
+}
+
+- so we use state variables
+
+State varibles in React:
+==========================
+Re-rendering: When a state variable changes, React re-renders the component and updates the UI.
+Persistence: State values are preserved between renders. - values are saved
+
 What is State in React?
 ==========================
+- state is javscript oject used to  store the dynamic data.
+- it is mutable (changeble)
+- in function , by using useState,useReducer,Redux we create a state and store the variables(number,string,object,arr etc) inside
+- in classes , by using this.state(property acquires from React.Component) we can strore and setState() used to change state data.
+- in classes, -If a piece of code needs to be executed only after the state has been updated, then place that code in the callback function which is the second arguement to setState()
+ Syntax: setState( StateObject, callbackFunction);
 
+Note:
+-----
+-setState() actions are asynchronous. setState() doesn’t immediately mutate this.state.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
 forceUpdate:
 ==============
 Def : forceUpdate() is function and  used in class components to manually trigger a re-render, even if state or props haven't changed.
